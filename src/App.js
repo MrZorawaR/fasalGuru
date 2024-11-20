@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-// import "./App.css";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 
@@ -18,15 +17,15 @@ function App() {
     }
   }, [chatHistory, generatingAnswer]);
 
-  async function generateAnswer(e) {
-    e.preventDefault();
-    if (!question.trim()) return;
+  async function generateAnswer(e, customQuestion) {
+    if (e) e.preventDefault();
+
+    const currentQuestion = customQuestion || question;
+    if (!currentQuestion.trim()) return;
 
     setGeneratingAnswer(true);
-    const currentQuestion = question;
-    setQuestion(""); // Clear input immediately after sending
+    setQuestion(""); 
 
-    // Add user question to chat history
     setChatHistory((prev) => [
       ...prev,
       { type: "question", content: currentQuestion },
@@ -37,7 +36,7 @@ function App() {
         url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBfydMVeTuKMaIF2DekcUE9hGrYkGXj3A0`,
         method: "post",
         data: {
-          contents: [{ parts: [{ text: question }] }],
+          contents: [{ parts: [{ text: currentQuestion }] }],
         },
       });
 
@@ -55,20 +54,18 @@ function App() {
     setGeneratingAnswer(false);
   }
 
+  function handleQuestionClick(e) {
+    const question = e.target.closest(".inbuilt-questions").innerText.trim();
+    generateAnswer(null, question);
+  }
+
   return (
     <div className="fixed inset-0 bg-gradient-to-r from-blue-50 to-blue-100">
       <div className="h-full max-w-4xl mx-auto flex flex-col p-3">
         <header className="text-center py-4">
-          <a
-            href=""
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
             <h1 className="text-4xl font-bold text-blue-500 hover:text-blue-600 transition-colors">
               FasalGuru's Chat AI
             </h1>
-          </a>
         </header>
 
         <div
@@ -78,7 +75,7 @@ function App() {
           {chatHistory.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6">
               <div className="bg-blue-50 rounded-xl p-8 max-w-2xl">
-                <h2 className="text-2xl font-bold text-blue-600 mb-4">
+                <h2 className="text-2xl font-bold text-blue-600 hover:text-blue-800  mb-4">
                   Welcome to FasalGuru! 👋
                 </h2>
                 <p className="text-gray-600 mb-4">
@@ -86,18 +83,29 @@ function App() {
                   चाहते हैं। आप मुझसे निम्न के बारे में पूछ सकते हैं:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <div
+                    className="inbuilt-questions bg-white p-4 rounded-lg shadow-sm hover:cursor-pointer"
+                    onClick={handleQuestionClick}
+                  >
                     <span className="text-blue-500">🌾</span> कृषि टिप्स
                   </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <span className="text-blue-500">📊</span> फसल प्रबंधन
-                    जानकारी
+                  <div
+                    className="inbuilt-questions bg-white p-4 rounded-lg shadow-sm hover:cursor-pointer"
+                    onClick={handleQuestionClick}
+                  >
+                    <span className="text-blue-500">📊</span> फसल प्रबंधन जानकारी
                   </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <div
+                    className="inbuilt-questions bg-white p-4 rounded-lg shadow-sm hover:cursor-pointer"
+                    onClick={handleQuestionClick}
+                  >
                     <span className="text-blue-500">💧</span> सिंचाई एवं खाद
                     संबंधी सलाह
                   </div>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <div
+                    className="inbuilt-questions bg-white p-4 rounded-lg shadow-sm hover:cursor-pointer"
+                    onClick={handleQuestionClick}
+                  >
                     <span className="text-blue-500">🚜</span> कृषि उपकरण सुझाव
                   </div>
                 </div>
@@ -142,7 +150,7 @@ function App() {
 
         {/* Fixed Input Form */}
         <form
-          onSubmit={generateAnswer}
+          onSubmit={(e) => generateAnswer(e, null)}
           className="bg-white rounded-lg shadow-lg p-4"
         >
           <div className="flex gap-2">
@@ -156,7 +164,7 @@ function App() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  generateAnswer(e);
+                  generateAnswer(e, null);
                 }
               }}
             ></textarea>
