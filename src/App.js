@@ -9,7 +9,6 @@ function App() {
   const [answer, setAnswer] = useState("");
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
   const [isListening, setIsListening] = useState(false);
-
   const chatContainerRef = useRef(null);
 
   const SpeechRecognition =
@@ -88,7 +87,6 @@ function App() {
     setGeneratingAnswer(true);
     setQuestion("");
 
-    // Clear the previous chat history when a new question is asked
     setChatHistory([]);
 
     setChatHistory((prev) => [
@@ -98,7 +96,7 @@ function App() {
 
     try {
       const response = await axios({
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyBfydMVeTuKMaIF2DekcUE9hGrYkGXj3A0`,
+        url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBfydMVeTuKMaIF2DekcUE9hGrYkGXj3A0",
         method: "post",
         data: {
           contents: [{ parts: [{ text: currentQuestion }] }],
@@ -212,7 +210,7 @@ function App() {
                   {chat.type === "answer" && (
                     <button
                     onClick={() => speakAnswer(answer)}  // Pass the function reference
-                    className="ml-2 mt-5 px-2 py- rounded-md hover:bg-gray-100 hover:opacity-50 transition-colors  "
+                    className="ml-2 mt-5 px-2 py- rounded-md hover:bg-gray-100 hover:opacity-50 transition-colors"
                   >
                     <Volume2 />
                   </button>
